@@ -19,6 +19,8 @@ Watermark_FeatnamesAmmount = 3;
 Watermark_Features = 0;
 AllPlayers = gui.add_tab("MNDY All Players")
 
+Current_Build_Num = "3411"
+
 ---TSE NUMBERS---
 CAR_INSURANCE = 1655503526
 SEND_BASIC_TEXT = -1773335296
@@ -31,22 +33,38 @@ COLLECTIBLE_COLLECTED = 968269233
 LEAVE_VEHICLE = -503325966
 BOSS_SHOULD_LAUNCH_WVM = 259469385
 
+Game = {}
+Game.__index = Game
 
+Game.Version = function() -- credits xesdoog
+  local pVers = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+  local pBnum = pVers:add(0x24):rip()
+  local pOver = pBnum:add(0x20)
+  local rt = {
+    _build  = pBnum:get_string(),
+    _online = pOver:get_string()
+  }
+  return rt
+end
 
-
+if Game.Version()._build == Current_Build_Num then
+	gui.show_message("NewWay", LuaName .. " Loaded\nWelcome: ".. PLAYER.GET_PLAYER_NAME(PLAYER.PLAYER_ID()) .. "\nStatus: Updated ("..Game.Version()._build..") ("..Game.Version()._online.. ")" );
+else 
+	gui.show_message("NewWay", LuaName .. " Loaded\nWelcome: ".. PLAYER.GET_PLAYER_NAME(PLAYER.PLAYER_ID()) .. "\nStatus: OUTDATED (3411)\nSome options may not work or be detected\nUse at your own risk");
+end
 
 --======================================================================-
 --===============================Functions==============================-
 --======================================================================-
-TransactionGlobal = 4537311; --1.69
+TransactionGlobal = 4537945; --1.70 --am_arena_shp.c
 function MoneyTransactions(hash, amount)
-	GlobalInt(TransactionGlobal + 1, 2147483646);
-	GlobalInt(TransactionGlobal + 7, 2147483647);
-	GlobalInt(TransactionGlobal + 6, 0);
-	GlobalInt(TransactionGlobal + 5, 0);
-	GlobalInt(TransactionGlobal + 3, hash);
-	GlobalInt(TransactionGlobal + 2, amount);
-	GlobalInt(TransactionGlobal, 2);
+	globals.set_int(TransactionGlobal + 1, 2147483646)
+    globals.set_int(TransactionGlobal + 7, 2147483647)
+    globals.set_int(TransactionGlobal + 6, 0)
+    globals.set_int(TransactionGlobal + 5, 0)
+    globals.set_int(TransactionGlobal + 3, hash)
+    globals.set_int(TransactionGlobal + 2, amount)
+    globals.set_int(TransactionGlobal,2)
 end
 
 local function MPX()
@@ -291,7 +309,11 @@ gui.add_imgui(function()
 		ImGui.SetWindowFontScale(1.025);
 		ImGui.SetWindowSize(565, 400);
 		ImGui.Indent(5);
-		ImGui.Text("Welcome: " .. PLAYER.GET_PLAYER_NAME(PLAYER.PLAYER_ID()) .. " To MNDY Lua\nBuild: 01/09/2024 \nVersion: 1.69 (3274) ");
+		if Game.Version()._build == Current_Build_Num then
+			ImGui.Text("Welcome: " .. PLAYER.GET_PLAYER_NAME(PLAYER.PLAYER_ID()) .. " To MNDY Lua\nBuild: " ..Game.Version()._build.."\nVersion: "..Game.Version()._online.. " (UPDATED) ");
+		else 
+			ImGui.Text("Welcome: " .. PLAYER.GET_PLAYER_NAME(PLAYER.PLAYER_ID()) .. " To MNDY Lua\nBuild: OUTDATED \nVersion: OUTDATED ");
+		end
 		ImGui.SameLine(400);
 		ImGui.Text("  Session Details: \n   Players: " .. GetPlayerCount() .. "/32 \n   Host: " .. PLAYER.GET_PLAYER_NAME(GetHost()));
 		ImGui.Unindent(5);
@@ -433,6 +455,7 @@ gui.add_imgui(function()
 							end
 						end
 					end);
+					
 					script.run_in_fiber(function(script)
 						if isWaterMarkChanged then
 							while Watermark do
@@ -457,6 +480,13 @@ gui.add_imgui(function()
 							end
 						end
 					end);
+					if ImGui.Button("Add Snow") then
+						globals.set_int(262145 + 4413, 1)
+					end
+					ImGui.SameLine();
+					if ImGui.Button("Remove Snow") then
+						globals.set_int(262145 + 4413, 0)
+					end
 					ImGui.EndChild();
 				end
 				if ImGui.BeginChild("DebugMNDY", 430, 100) then
@@ -492,6 +522,10 @@ gui.add_imgui(function()
 							end
 						end
 					end);
+					if ImGui.Button("Show Current GTA V Build") then
+						iconNotification("CHAR_FILMNOIR", "CHAR_FILMNOIR", true, 1, "MNDY", "Build: "..Game.Version()._build.."\nOnline Ver: "..Game.Version()._online.. " ");
+						gui.show_message("NewWay","Build: ("..Game.Version()._build..")\nGame Ver: ("..Game.Version()._online.. ")" );
+					end
 					ImGui.EndChild();
 				end
 				ImGui.EndTabItem();
@@ -825,25 +859,25 @@ gui.add_imgui(function()
 
 					GiveCasinoChips, GiveCasinoChipsUsed = ImGui.Checkbox("5K Chips", GiveCasinoChips);
 					ImGui.SameLine()
-					FiftyK, FiftyKUsed = ImGui.Checkbox("50K Loop ", FiftyK);
+					--[[FiftyK, FiftyKUsed = ImGui.Checkbox("50K Loop ", FiftyK);
 					ImGui.SameLine()
 					hunderedK, hunderedKUsed = ImGui.Checkbox("100K Loop ", hunderedK);	
 					ImGui.SameLine()
-					oneeightK, oneeightKUsed = ImGui.Checkbox("180K Loop ", oneeightK);
+					oneeightK, oneeightKUsed = ImGui.Checkbox("180K Loop ", oneeightK);]]
 					script.run_in_fiber(function(script)
 						if GiveCasinoChipsUsed then
 							while GiveCasinoChips do
 								script:sleep(500);
-								GlobalInt(1964419, 1)
+								GlobalInt(1965183, 1)
 							end
 						end
 					end);
 
-					script.run_in_fiber(function(script)
+					--[[script.run_in_fiber(function(script)
 						if FiftyKUsed then
 							while FiftyK do
 								script:sleep(500);
-								MoneyTransactions(1628412596, 50000)
+								MoneyTransactions(0x9145F938, 50000)
 							end
 						end
 					end);
@@ -865,7 +899,7 @@ gui.add_imgui(function()
 								MoneyTransactions(0x615762F1, 180000)
 							end
 						end
-					end);
+					end);]]
 
 					ImGui.EndChild();
 				end
@@ -1431,4 +1465,3 @@ AllPlayers:add_button("Mount Chiliad", function()
     ENTITY.SET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED(PLAYER.PLAYER_ID()), 501.403, 5598.647, 796.137, false, false, true,
         true);
 end);
-
